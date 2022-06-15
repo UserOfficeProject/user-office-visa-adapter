@@ -6,6 +6,7 @@
   "scripts": {
     "start": "tsc && node ./build/index.js",
     "debug": "ts-node-dev --inspect --respawn -T ./src/index.ts",
+    "build": "rm -rf ./build && tsc",
     "lint": "tsc --noEmit && eslint . --ext .js,.ts --quiet",
     "lint:fix": "tsc --noEmit && eslint . --ext .js,.ts --fix --quiet"
   },
