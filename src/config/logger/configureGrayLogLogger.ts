@@ -13,8 +13,8 @@ export function configureGraylogLogger() {
       new GrayLogLogger(
         server,
         parseInt(port),
-        { facility: 'DMSC', environment: env, service: 'duo-backend' },
-        ['QueryName', 'UserID']
+        { facility: 'DMSC', environment: env, service: 'duo-visa-adapter' },
+        []
       )
     );
   } else {
