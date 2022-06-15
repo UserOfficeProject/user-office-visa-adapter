@@ -7,5 +7,3 @@ switch (process.env.DEPENDENCY_CONFIG) {
   default:
     require('./dependencyConfigRun');
 }
-
-export {};
