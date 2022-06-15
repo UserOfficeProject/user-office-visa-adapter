@@ -11,10 +11,7 @@ async function bootstrap() {
   const PORT = process.env.PORT || 4010;
   const app = express();
 
-  app
-    .use(healthCheck())
-    .use(readinessCheck())
-    .use(express.json({ limit: '5mb' }));
+  app.use(healthCheck()).use(readinessCheck());
 
   app.listen(PORT);
 
