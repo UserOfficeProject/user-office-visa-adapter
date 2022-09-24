@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "@graphql-codegen/cli": "^2.6.3",
-    "@graphql-codegen/typescript": "^2.4.9",
+    "@graphql-codegen/typescript": "^2.7.3",
     "@graphql-codegen/typescript-graphql-request": "^4.4.6",
     "@graphql-codegen/typescript-operations": "^2.4.3",
     "@user-office-software/duo-logger": "^2.0.2",
