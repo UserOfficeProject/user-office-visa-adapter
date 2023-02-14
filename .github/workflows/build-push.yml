@@ -24,8 +24,8 @@ jobs:
       - id: extract_branch
         uses: swapActions/get-branch-name@v1
 
-      - name: Create backend image tags
-        id: meta-backend
+      - name: Create image tags
+        id: meta
         uses: docker/metadata-action@v4
         with:
           images: |
@@ -58,8 +58,8 @@ jobs:
       - name: Install Node.js dependencies
         run: npm ci
 
-      - name: Build and push backend
+      - name: Build and push
         uses: docker/build-push-action@v3
         with:
           push: true
-          tags: ${{ steps.meta-backend.outputs.tags }}
+          tags: ${{ steps.meta.outputs.tags }}
