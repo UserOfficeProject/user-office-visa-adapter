@@ -18,6 +18,7 @@ export class RabbitMQConsumer implements QueueConsumer {
       hostname: process.env.RABBITMQ_HOSTNAME,
       username: process.env.RABBITMQ_USERNAME,
       password: process.env.RABBITMQ_PASSWORD,
+      port: Number(process.env.RABBITMQ_PORT) || 5672,
     });
 
     this.rabbitMQ.listenOn(Queue.VISA, this.consumerCallback);
