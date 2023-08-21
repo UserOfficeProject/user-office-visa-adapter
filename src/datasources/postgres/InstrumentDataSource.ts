@@ -17,13 +17,28 @@ export default class PostgresInstrumentDataSource
   }
 
   async update(instrument: Instrument): Promise<Instrument> {
-    await database(this.TABLE_NAME)
+    const instrumentExists = await database(this.TABLE_NAME)
       .where({
         id: instrument.id,
       })
-      .update({
-        name: instrument.name,
-      });
+      .first();
+
+    if (instrumentExists) {
+      await database(this.TABLE_NAME)
+        .where({
+          id: instrument.id,
+        })
+        .update({
+          name: instrument.name,
+        });
+
+      return instrument;
+    }
+
+    await database(this.TABLE_NAME).insert({
+      id: instrument.id,
+      name: instrument.name,
+    });
 
     return instrument;
   }
