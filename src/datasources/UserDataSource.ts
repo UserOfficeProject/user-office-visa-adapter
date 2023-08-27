@@ -1,19 +1,9 @@
-import { Role } from '../models/Role';
 import { User } from '../models/User';
-
-export interface UserLinkResponse {
-  user: User;
-  link: string;
-}
-
-export interface EmailInviteResponse {
-  userId: number;
-  inviterId: number;
-  role: Role;
-}
+import { ProposerPayload } from '../types/proposal';
+import { UserUpdationEventPayload } from '../types/user';
 
 export interface UserDataSource {
-  create(user: User): Promise<User>;
-  update(user: User): Promise<User>;
+  create(user: ProposerPayload): Promise<User>;
+  update(user: UserUpdationEventPayload): Promise<User>;
   delete(userId: number): Promise<number>;
 }

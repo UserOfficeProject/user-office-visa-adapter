@@ -52,7 +52,6 @@ handlers.set(Event.USER_DELETED, handleUserDeleted);
 
 const startQueueHandling = async (): Promise<void> => {
   const consumer = container.resolve<QueueConsumer>(Tokens.QueueConsumer);
-
   consumer.start(consumerCallback);
 };
 

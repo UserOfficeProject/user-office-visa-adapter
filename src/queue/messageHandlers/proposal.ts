@@ -4,52 +4,48 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
-import { Instrument } from '../../models/Instrument';
 import {
-  Proposal,
-  ProposalStatusDefaultShortCodes,
-} from '../../models/Proposal';
-import { User } from '../../models/User';
+  ProposalDeletionEventPayload,
+  ProposalStatusChangedEventPayload,
+  ProposalSubmissionEventPayload,
+  ProposalUpdationEventPayload,
+} from '../../types/proposal';
 
-export interface ProposalWithNewStatus {
-  proposalPk: Proposal['proposalPk'];
-  shortCode: Proposal['shortCode'];
-  instrument: Instrument;
-  title: Proposal['title'];
-  abstract: Proposal['abstract'];
-  callId: number;
-  allocatedTime: number;
-  instrumentId: Instrument['id'];
-  members: User[];
-  newStatus: ProposalStatusDefaultShortCodes;
-  submitted: Proposal['submitted'];
-}
-
-const ds = container.resolve<ProposalDataSource>(Tokens.ProposalDataSource);
+const proposalDatasource = container.resolve<ProposalDataSource>(
+  Tokens.ProposalDataSource
+);
 const userDataSource = container.resolve<UserDataSource>(Tokens.UserDataSource);
 
 const handleProposalSubmitted: ConsumerCallback = async (_type, message) => {
-  const proposal = message as unknown as Proposal;
-  await ds.create(proposal);
+  const proposal = message as unknown as ProposalSubmissionEventPayload;
+  await proposalDatasource.create(proposal);
 };
 
 const handleProposalUpdated: ConsumerCallback = async (_type, message) => {
-  const proposal = message as unknown as Proposal;
-  await ds.update(proposal);
+  const proposal = message as unknown as ProposalUpdationEventPayload;
+  await proposalDatasource.update(proposal);
 };
 
 const handleProposalDeleted: ConsumerCallback = async (_type, message) => {
-  const proposal = message as unknown as Proposal;
-  await ds.delete(proposal.proposalPk);
+  const proposal = message as unknown as ProposalDeletionEventPayload;
+  await proposalDatasource.delete(proposal.proposalPk);
 };
 
 const handleProposalStatusChanged: ConsumerCallback = async (
   _type,
   message
 ) => {
-  const ProposalWithNewStatus = message as unknown as ProposalWithNewStatus;
-  const members = ProposalWithNewStatus.members;
-  // Create new user for the members
+  const proposalWithNewStatus =
+    message as unknown as ProposalStatusChangedEventPayload;
+
+  if (!['ALLOCATED', 'SCHEDULING'].includes(proposalWithNewStatus.newStatus))
+    return;
+  // Create new user for the proposer
+  const proposer = proposalWithNewStatus.proposer;
+  await userDataSource.create(proposer);
+
+  // Create new user for the co-proposer
+  const members = proposalWithNewStatus.members;
   for (const member of members) {
     await userDataSource.create(member);
   }

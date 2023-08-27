@@ -1,15 +1,11 @@
 export class Role {
   constructor(
     public id: number,
-    public shortCode: string,
-    public title: string
+    public description: string,
+    public name: string
   ) {}
 }
 
-export class RoleUser {
-  constructor(
-    public roleUserId: number,
-    public userId: number,
-    public roleId: number
-  ) {}
+export class UserRole {
+  constructor(public userId: number, public roleId: number) {}
 }

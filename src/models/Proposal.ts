@@ -14,24 +14,10 @@ export enum ProposalStatusDefaultShortCodes {
 
 export class Proposal {
   constructor(
-    public proposalPk: number,
-    public shortCode: string,
-    public title: string,
-    public abstract: string,
-    public proposerId: number,
-    public statusId: number, // proposal status id while it moving though proposal workflow
-    public created: Date,
-    public updated: Date,
-    public proposalId: string,
-    public finalStatus: ProposalStatusDefaultShortCodes,
-    public callId: number,
-    public questionaryId: number,
-    public commentForUser: string,
-    public commentForManagement: string,
-    public notified: boolean,
-    public submitted: boolean,
-    public referenceNumberSequence: number,
-    public managementTimeAllocation: number,
-    public managementDecisionSubmitted: boolean
+    public id: number,
+    public identifier: string,
+    public publicAt: string,
+    public summary: string,
+    public title: string
   ) {}
 }

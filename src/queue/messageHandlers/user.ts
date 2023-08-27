@@ -3,17 +3,20 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { UserDataSource } from '../../datasources/UserDataSource';
-import { User } from '../../models/User';
+import {
+  UserDeletionEventPayload,
+  UserUpdationEventPayload,
+} from '../../types/user';
 
 const userDataSource = container.resolve<UserDataSource>(Tokens.UserDataSource);
 
 const handleUserUpdated: ConsumerCallback = async (_type, message) => {
-  const user = message as unknown as User;
+  const user = message as unknown as UserUpdationEventPayload;
   await userDataSource.update(user);
 };
 
 const handleUserDeleted: ConsumerCallback = async (_type, message) => {
-  const user = message as unknown as User;
+  const user = message as unknown as UserDeletionEventPayload;
   await userDataSource.delete(user.id);
 };
 
