@@ -1,13 +1,13 @@
 export interface InstitutionPayload {
   id: number;
   name: string;
-  country: number;
+  country?: number;
   verified: boolean;
 }
 
 export interface CountryPayload {
-  countryId: number;
-  country: string;
+  countryId?: number;
+  country?: string;
 }
 
 export interface ProposerPayload {
