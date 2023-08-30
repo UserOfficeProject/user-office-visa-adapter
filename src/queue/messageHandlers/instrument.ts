@@ -3,23 +3,29 @@ import { container } from 'tsyringe';
 
 import { Tokens } from '../../config/Tokens';
 import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
-import { Instrument } from '../../models/Instrument';
+import {
+  InstrumentCreationEventPayload,
+  InstrumentDeletionEventPayload,
+  InstrumentUpdationEventPayload,
+} from '../../types/instrument';
 
-const ds = container.resolve<InstrumentDataSource>(Tokens.InstrumentDataSource);
+const instrumentDatasource = container.resolve<InstrumentDataSource>(
+  Tokens.InstrumentDataSource
+);
 
 const handleInstrumentCreated: ConsumerCallback = async (_type, message) => {
-  const instrument: Instrument = message as unknown as Instrument;
-  await ds.create(instrument);
-};
-
-const handleInstrumentDeleted: ConsumerCallback = async (_type, message) => {
-  const instrument: Instrument = message as unknown as Instrument;
-  await ds.delete(instrument.id);
+  const instrument = message as unknown as InstrumentCreationEventPayload;
+  await instrumentDatasource.create(instrument);
 };
 
 const handleInstrumentUpdated: ConsumerCallback = async (_type, message) => {
-  const instrument: Instrument = message as unknown as Instrument;
-  await ds.update(instrument);
+  const instrument = message as unknown as InstrumentUpdationEventPayload;
+  await instrumentDatasource.update(instrument);
+};
+
+const handleInstrumentDeleted: ConsumerCallback = async (_type, message) => {
+  const instrument = message as unknown as InstrumentDeletionEventPayload;
+  await instrumentDatasource.delete(instrument.id);
 };
 
 export {

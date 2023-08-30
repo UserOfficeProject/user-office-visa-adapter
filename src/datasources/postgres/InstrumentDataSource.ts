@@ -1,4 +1,9 @@
 import { Instrument } from '../../models/Instrument';
+import {
+  InstrumentCreationEventPayload,
+  InstrumentUpdationEventPayload,
+} from '../../types/instrument';
+import { InstrumentRecord, createInstrumentObject } from '../../types/records';
 import { InstrumentDataSource } from '../InstrumentDataSource';
 import database from './database';
 
@@ -7,25 +12,52 @@ export default class PostgresInstrumentDataSource
 {
   private TABLE_NAME = 'instrument';
 
-  async create(instrument: Instrument): Promise<Instrument> {
-    await database(this.TABLE_NAME).insert({
-      id: instrument.id,
-      name: instrument.name,
-    });
-
-    return instrument;
+  async create(
+    instrument: InstrumentCreationEventPayload
+  ): Promise<Instrument> {
+    return await database(this.TABLE_NAME)
+      .insert({
+        id: instrument.id,
+        name: instrument.name,
+      })
+      .returning(['*'])
+      .then((instrument: InstrumentRecord[]) => {
+        return createInstrumentObject(instrument[0]);
+      });
   }
 
-  async update(instrument: Instrument): Promise<Instrument> {
-    await database(this.TABLE_NAME)
+  async update(
+    instrument: InstrumentUpdationEventPayload
+  ): Promise<Instrument> {
+    const instrumentExists = await database(this.TABLE_NAME)
       .where({
         id: instrument.id,
       })
-      .update({
-        name: instrument.name,
-      });
+      .first();
 
-    return instrument;
+    if (instrumentExists) {
+      return await database(this.TABLE_NAME)
+        .where({
+          id: instrument.id,
+        })
+        .update({
+          name: instrument.name,
+        })
+        .returning(['*'])
+        .then((instrument: InstrumentRecord[]) => {
+          return createInstrumentObject(instrument[0]);
+        });
+    }
+
+    return await database(this.TABLE_NAME)
+      .insert({
+        id: instrument.id,
+        name: instrument.name,
+      })
+      .returning(['*'])
+      .then((instrument: InstrumentRecord[]) => {
+        return createInstrumentObject(instrument[0]);
+      });
   }
 
   async delete(id: number) {
@@ -33,7 +65,11 @@ export default class PostgresInstrumentDataSource
       .where({
         id: id,
       })
-      .delete();
+      .delete()
+      .returning(['*'])
+      .then((instrument: InstrumentRecord[]) => {
+        return createInstrumentObject(instrument[0]);
+      });
 
     return id;
   }
