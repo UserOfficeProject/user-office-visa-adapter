@@ -34,6 +34,12 @@ export interface ProposalSubmissionEventPayload {
   proposer: ProposerPayload;
 }
 
+export interface ProposalInstrumentSelectedPayload {
+  instrumentId: number;
+  proposalPks: [number];
+  submitted: boolean;
+}
+
 export type ProposalUpdationEventPayload = ProposalSubmissionEventPayload;
 
 export type ProposalDeletionEventPayload = ProposalSubmissionEventPayload;

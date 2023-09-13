@@ -1,4 +1,6 @@
 import { Employer } from '../models/Employer';
+import { Experiment } from '../models/Experiment';
+import { ExperimentUser } from '../models/ExperimentUser';
 import { Instrument } from '../models/Instrument';
 import { Proposal } from '../models/Proposal';
 import { Role } from '../models/Role';
@@ -45,6 +47,39 @@ export const createProposalObject = (proposal: ProposalRecord) => {
     proposal.title
   );
 };
+
+export interface ExperimentRecord {
+  readonly id: string;
+  readonly start_date: string;
+  readonly end_date: string;
+  readonly proposal_id: number;
+  readonly instrument_id: number;
+}
+
+export const createExperimentObject = (experiment: ExperimentRecord) => {
+  return new Experiment(
+    experiment.id,
+    experiment.start_date,
+    experiment.end_date,
+    experiment.proposal_id,
+    experiment.instrument_id
+  );
+};
+
+export interface ExperimentUserRecord {
+  readonly experiment_id: string;
+  readonly user_id: string;
+}
+
+export const createExperimentUserObject = (
+  experimentUser: ExperimentUserRecord
+) => {
+  return new ExperimentUser(
+    experimentUser.experiment_id,
+    experimentUser.user_id
+  );
+};
+
 export interface UserRecord {
   readonly id: string;
   readonly activated_at: string;

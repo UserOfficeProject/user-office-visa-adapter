@@ -15,6 +15,7 @@ import {
   handleProposalDeleted,
   handleProposalUpdated,
   handleProposalStatusChanged,
+  handleProposalInstrumentSelected,
 } from './messageHandlers/proposal';
 import { handleUserDeleted, handleUserUpdated } from './messageHandlers/user';
 
@@ -49,6 +50,10 @@ handlers.set(
 );
 handlers.set(Event.USER_UPDATED, handleUserUpdated);
 handlers.set(Event.USER_DELETED, handleUserDeleted);
+handlers.set(
+  Event.PROPOSAL_INSTRUMENT_SELECTED,
+  handleProposalInstrumentSelected
+);
 
 const startQueueHandling = async (): Promise<void> => {
   const consumer = container.resolve<QueueConsumer>(Tokens.QueueConsumer);

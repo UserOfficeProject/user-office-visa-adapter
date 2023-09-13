@@ -10,6 +10,16 @@ import database from './database';
 export default class PostgresProposalDataSource implements ProposalDataSource {
   private TABLE_NAME = 'proposal';
 
+  async get(id: number): Promise<Proposal | null> {
+    return await database(this.TABLE_NAME)
+      .where({
+        id,
+      })
+      .first()
+      .then((proposal: ProposalRecord | null) => {
+        return proposal ? createProposalObject(proposal) : null;
+      });
+  }
   async create(proposal: ProposalSubmissionEventPayload): Promise<Proposal> {
     return await database(this.TABLE_NAME)
       .insert({
@@ -19,7 +29,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
         summary: proposal.abstract,
       })
       .returning(['*'])
-      .then((proposal: ProposalRecord[]) => {
+      .then(async (proposal: ProposalRecord[]) => {
         return createProposalObject(proposal[0]);
       });
   }
