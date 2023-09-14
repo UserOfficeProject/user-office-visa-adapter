@@ -35,13 +35,6 @@ export class RabbitMQConsumer implements QueueConsumer {
     this.consumerCallback = consumerCallback;
     this.rabbitMQ = new RabbitMQMessageBroker();
 
-    console.log('Environment variables: ', {
-      hostname: process.env.RABBITMQ_HOSTNAME,
-      username: process.env.RABBITMQ_USERNAME,
-      password: process.env.RABBITMQ_PASSWORD,
-      port: Number(process.env.RABBITMQ_PORT) || 5672,
-    });
-
     this.rabbitMQ.setup({
       hostname: process.env.RABBITMQ_HOSTNAME,
       username: process.env.RABBITMQ_USERNAME,
