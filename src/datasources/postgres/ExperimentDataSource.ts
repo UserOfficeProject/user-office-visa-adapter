@@ -44,18 +44,12 @@ export default class PostgresExperimentDataSource
         });
     }
 
-    const now = new Date();
-    now.setHours(0);
-    now.setMinutes(0);
-    now.setSeconds(0);
-    now.setMilliseconds(0);
-
     return await database(this.TABLE_NAME)
       .insert({
         id: proposalPk,
         proposal_id: proposalPk,
         instrument_id: instrumentId,
-        start_date: now,
+        start_date: '2022-01-01 00:00:00',
         end_date: new Date(
           new Date().setFullYear(new Date().getFullYear() + 1)
         ),
