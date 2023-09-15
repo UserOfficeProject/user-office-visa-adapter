@@ -17,7 +17,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   async create(user: ProposerPayload): Promise<User> {
     const userExists = await database(this.TABLE_NAME)
       .where({
-        email: user.email,
+        id: user.email,
       })
       .first()
       .then((user: UserRecord) => {
