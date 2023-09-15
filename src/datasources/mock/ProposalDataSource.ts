@@ -6,6 +6,9 @@ import {
 import { ProposalDataSource } from '../ProposalDataSource';
 
 export default class MockProposalDataSource implements ProposalDataSource {
+  get(id: number): Promise<Proposal | null> {
+    throw new Error('Method not implemented.');
+  }
   async create(proposal: ProposalSubmissionEventPayload): Promise<Proposal> {
     throw new Error('Method not implemented.');
   }
