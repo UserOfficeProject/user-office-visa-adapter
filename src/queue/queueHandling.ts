@@ -15,7 +15,13 @@ const consumerCallback: ConsumerCallback = async (
   const handler = handlers.get(type as Event);
   if (handler) {
     logger.logInfo('Handling event', { type, message });
-    handler(type, message, properties);
+    try {
+      await handler(type, message, properties);
+    } catch (error) {
+      logger.logError('Error handling event', { type, message, error });
+    } finally {
+      logger.logInfo('Finished handling event', { type, message });
+    }
   } else {
     logger.logError('No handler for event type', { type, message });
   }
