@@ -63,14 +63,15 @@ const handleProposalStatusChanged: ConsumerCallback = async (
 ) => {
   const proposalWithNewStatus =
     message as unknown as ProposalStatusChangedEventPayload;
-
   if (!['ALLOCATED', 'SCHEDULING'].includes(proposalWithNewStatus.newStatus))
     return;
   // Create new user for the proposer
-  await createUserAndAssignToExperiment(
-    proposalWithNewStatus.proposer,
-    proposalWithNewStatus.proposalPk
-  );
+  if (proposalWithNewStatus.proposer) {
+    await createUserAndAssignToExperiment(
+      proposalWithNewStatus.proposer,
+      proposalWithNewStatus.proposalPk
+    );
+  }
   // Create new user for the co-proposer
   const members = proposalWithNewStatus.members;
   for (const member of members) {

@@ -31,7 +31,7 @@ export interface ProposalSubmissionEventPayload {
   members: ProposerPayload[];
   newStatus: 'DRAFT';
   submitted: boolean;
-  proposer: ProposerPayload;
+  proposer?: ProposerPayload;
 }
 
 export interface ProposalInstrumentSelectedPayload {
