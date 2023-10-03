@@ -32,6 +32,10 @@ export interface ProposalSubmissionEventPayload {
   newStatus: 'DRAFT';
   submitted: boolean;
   proposer?: ProposerPayload;
+  instrument: {
+    id: number;
+    shortCode: string;
+  };
 }
 
 export interface ProposalInstrumentSelectedPayload {
