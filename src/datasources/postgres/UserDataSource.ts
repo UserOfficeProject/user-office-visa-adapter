@@ -14,6 +14,8 @@ import database from './database';
 export default class PostgresUserDataSource implements UserDataSource {
   private TABLE_NAME = 'users';
   private EMPLOYER_TABLE_NAME = 'employer';
+  private USER_ROLE = 'user_role';
+  private ROLE = 'role';
   async create(user: ProposerPayload): Promise<User> {
     const userExists = await database(this.TABLE_NAME)
       .where({
@@ -77,7 +79,20 @@ export default class PostgresUserDataSource implements UserDataSource {
           affiliation_id: employer.id,
         })
         .returning(['*'])
-        .then((user: UserRecord[]) => {
+        .then(async (user: UserRecord[]) => {
+          const scientificComputingRole = await database(this.ROLE)
+            .where({
+              name: 'SCIENTIFIC_COMPUTING',
+            })
+            .first();
+
+          if (scientificComputingRole) {
+            await database(this.USER_ROLE).insert({
+              user_id: user[0].id,
+              role_id: scientificComputingRole.id,
+            });
+          }
+
           return createUserObject(user[0]);
         });
     }
