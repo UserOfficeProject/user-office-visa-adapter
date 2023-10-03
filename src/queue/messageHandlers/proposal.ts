@@ -4,6 +4,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../../config/Tokens';
 import { ExperimentDataSource } from '../../datasources/ExperimentDataSource';
 import { ExperimentUserDataSource } from '../../datasources/ExperimentUserDataSource';
+import { InstrumentDataSource } from '../../datasources/InstrumentDataSource';
 import { ProposalDataSource } from '../../datasources/ProposalDataSource';
 import { UserDataSource } from '../../datasources/UserDataSource';
 import {
@@ -26,6 +27,10 @@ const experimentDataSource = container.resolve<ExperimentDataSource>(
 
 const experimentUserDataSource = container.resolve<ExperimentUserDataSource>(
   Tokens.ExperimentUserDataSource
+);
+
+const instrumentDataSource = container.resolve<InstrumentDataSource>(
+  Tokens.InstrumentDataSource
 );
 const handleProposalSubmitted: ConsumerCallback = async (_type, message) => {
   const proposal = message as unknown as ProposalSubmissionEventPayload;
@@ -65,6 +70,29 @@ const handleProposalStatusChanged: ConsumerCallback = async (
     message as unknown as ProposalStatusChangedEventPayload;
   if (!['ALLOCATED', 'SCHEDULING'].includes(proposalWithNewStatus.newStatus))
     return;
+  // Create New Proposal
+  let proposal = await proposalDatasource.get(proposalWithNewStatus.proposalPk);
+
+  if (!proposal) {
+    proposal = await proposalDatasource.create(proposalWithNewStatus);
+  }
+
+  // Get Instrument
+  let instrument = await instrumentDataSource.get(
+    proposalWithNewStatus.instrument.id
+  );
+  if (!instrument) {
+    instrument = await instrumentDataSource.create({
+      id: proposalWithNewStatus.instrument.id,
+      name: proposalWithNewStatus.instrument.shortCode,
+    });
+  }
+  // Assign Instrument to Proposal and create an Experiment
+  await experimentDataSource.create({
+    proposalPk: proposal.id,
+    instrumentId: instrument.id,
+  });
+
   // Create new user for the proposer
   if (proposalWithNewStatus.proposer) {
     await createUserAndAssignToExperiment(

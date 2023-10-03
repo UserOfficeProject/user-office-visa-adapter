@@ -5,19 +5,7 @@ import { container } from 'tsyringe';
 import { Tokens } from '../config/Tokens';
 import { Event } from '../models/Event';
 import { QueueConsumer } from './consumers/QueueConsumer';
-import {
-  handleInstrumentCreated,
-  handleInstrumentDeleted,
-  handleInstrumentUpdated,
-} from './messageHandlers/instrument';
-import {
-  handleProposalSubmitted,
-  handleProposalDeleted,
-  handleProposalUpdated,
-  handleProposalStatusChanged,
-  handleProposalInstrumentSelected,
-} from './messageHandlers/proposal';
-import { handleUserDeleted, handleUserUpdated } from './messageHandlers/user';
+import { handleProposalStatusChanged } from './messageHandlers/proposal';
 
 const consumerCallback: ConsumerCallback = async (
   type,
@@ -34,12 +22,12 @@ const consumerCallback: ConsumerCallback = async (
 };
 
 const handlers: Map<Event, ConsumerCallback> = new Map();
-handlers.set(Event.INSTRUMENT_CREATED, handleInstrumentCreated);
-handlers.set(Event.INSTRUMENT_DELETED, handleInstrumentDeleted);
-handlers.set(Event.INSTRUMENT_UPDATED, handleInstrumentUpdated);
-handlers.set(Event.PROPOSAL_SUBMITTED, handleProposalSubmitted);
-handlers.set(Event.PROPOSAL_DELETED, handleProposalDeleted);
-handlers.set(Event.PROPOSAL_UPDATED, handleProposalUpdated);
+// handlers.set(Event.INSTRUMENT_CREATED, handleInstrumentCreated);
+// handlers.set(Event.INSTRUMENT_DELETED, handleInstrumentDeleted);
+// handlers.set(Event.INSTRUMENT_UPDATED, handleInstrumentUpdated);
+// handlers.set(Event.PROPOSAL_SUBMITTED, handleProposalSubmitted);
+// handlers.set(Event.PROPOSAL_DELETED, handleProposalDeleted);
+// handlers.set(Event.PROPOSAL_UPDATED, handleProposalUpdated);
 handlers.set(
   Event.PROPOSAL_STATUS_CHANGED_BY_WORKFLOW,
   handleProposalStatusChanged
@@ -48,12 +36,12 @@ handlers.set(
   Event.PROPOSAL_STATUS_CHANGED_BY_USER,
   handleProposalStatusChanged
 );
-handlers.set(Event.USER_UPDATED, handleUserUpdated);
-handlers.set(Event.USER_DELETED, handleUserDeleted);
-handlers.set(
-  Event.PROPOSAL_INSTRUMENT_SELECTED,
-  handleProposalInstrumentSelected
-);
+// handlers.set(Event.USER_UPDATED, handleUserUpdated);
+// handlers.set(Event.USER_DELETED, handleUserDeleted);
+// handlers.set(
+//   Event.PROPOSAL_INSTRUMENT_SELECTED,
+//   handleProposalInstrumentSelected
+// );
 
 const startQueueHandling = async (): Promise<void> => {
   const consumer = container.resolve<QueueConsumer>(Tokens.QueueConsumer);

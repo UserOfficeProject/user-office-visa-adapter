@@ -12,6 +12,16 @@ export default class PostgresInstrumentDataSource
 {
   private TABLE_NAME = 'instrument';
 
+  async get(id: number): Promise<Instrument | null> {
+    return await database(this.TABLE_NAME)
+      .where({
+        id: id,
+      })
+      .first()
+      .then((instrument: InstrumentRecord | null) => {
+        return instrument ? createInstrumentObject(instrument) : null;
+      });
+  }
   async create(
     instrument: InstrumentCreationEventPayload
   ): Promise<Instrument> {

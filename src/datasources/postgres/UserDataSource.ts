@@ -29,7 +29,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     let employer: Employer;
     const employerExists = await database(this.EMPLOYER_TABLE_NAME)
       .where({
-        name: user.institution.name,
+        id: user.institution.id,
       })
       .first()
       .then((employer: EmployerRecord) => {
@@ -43,7 +43,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         .insert({
           id: user.institution.id,
           name: user.institution.name,
-          // country_code: user.country.country ?? '',
+          country_code: user.country.country ?? '',
         })
         .returning(['*'])
         .then((employer: EmployerRecord[]) => {
