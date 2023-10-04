@@ -10,14 +10,15 @@ export function configureGraylogLogger() {
 
   if (server && port) {
     const env = process.env.NODE_ENV || 'unset';
-    setLogger(
+    setLogger([
       new GrayLogLogger(
         server,
         parseInt(port),
         { facility: 'DMSC', environment: env, service: 'duo-visa-adapter' },
         []
-      )
-    );
+      ),
+      new ConsoleLogger(), // additionally log to console as that will show up in docker logs
+    ]);
   } else {
     setLogger(new ConsoleLogger());
     logger.logError(
