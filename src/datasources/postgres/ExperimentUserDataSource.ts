@@ -1,15 +1,25 @@
+import { Knex } from 'knex';
+import { container } from 'tsyringe';
+
+import { Tokens } from '../../config/Tokens';
 import { ExperimentUser } from '../../models/ExperimentUser';
 import {
   ExperimentUserRecord,
   createExperimentUserObject,
 } from '../../types/records';
 import { ExperimentUserDataSource } from '../ExperimentUserDataSource';
-import database from './database';
-
+import Database from './database/index';
 export default class PostgresExperimentUserDataSource
   implements ExperimentUserDataSource
 {
   private TABLE_NAME = 'experiment_user';
+  private database: Knex;
+  constructor() {
+    const databaseInstance = container.resolve<Database>(Tokens.Database);
+    (async () => {
+      this.database = await databaseInstance.connect();
+    })();
+  }
   async create({
     experimentId,
     userId,
@@ -17,7 +27,7 @@ export default class PostgresExperimentUserDataSource
     experimentId: string;
     userId: string;
   }): Promise<ExperimentUser> {
-    const experimentUserExists = await database(this.TABLE_NAME).where({
+    const experimentUserExists = await this.database(this.TABLE_NAME).where({
       experiment_id: experimentId,
       user_id: userId,
     });
@@ -26,7 +36,7 @@ export default class PostgresExperimentUserDataSource
       return experimentUserExists[0];
     }
 
-    return await database(this.TABLE_NAME)
+    return await this.database(this.TABLE_NAME)
       .insert({
         experiment_id: experimentId,
         user_id: userId,

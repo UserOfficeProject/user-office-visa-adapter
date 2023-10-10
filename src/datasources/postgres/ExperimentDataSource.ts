@@ -1,15 +1,24 @@
+import { Knex } from 'knex';
+import { container } from 'tsyringe';
+
+import { Tokens } from '../../config/Tokens';
 import { Experiment } from '../../models/Experiment';
 import { ExperimentRecord, createExperimentObject } from '../../types/records';
 import { ExperimentDataSource } from '../ExperimentDataSource';
-import database from './database';
-
+import Database from './database/index';
 export default class PostgresExperimentDataSource
   implements ExperimentDataSource
 {
   private TABLE_NAME = 'experiment';
-
+  private database: Knex;
+  constructor() {
+    const databaseInstance = container.resolve<Database>(Tokens.Database);
+    (async () => {
+      this.database = await databaseInstance.connect();
+    })();
+  }
   async getByProposalId(proposalPk: number): Promise<Experiment | null> {
-    return await database(this.TABLE_NAME)
+    return await this.database(this.TABLE_NAME)
       .where({
         proposal_id: proposalPk,
       })
@@ -26,12 +35,12 @@ export default class PostgresExperimentDataSource
     proposalPk: number;
     instrumentId: number;
   }): Promise<Experiment> {
-    const experimentExists = await database(this.TABLE_NAME).where({
+    const experimentExists = await this.database(this.TABLE_NAME).where({
       proposal_id: proposalPk,
     });
 
     if (experimentExists.length > 0) {
-      return await database(this.TABLE_NAME)
+      return await this.database(this.TABLE_NAME)
         .where({
           proposal_id: proposalPk,
         })
@@ -44,7 +53,7 @@ export default class PostgresExperimentDataSource
         });
     }
 
-    return await database(this.TABLE_NAME)
+    return await this.database(this.TABLE_NAME)
       .insert({
         id: proposalPk,
         proposal_id: proposalPk,

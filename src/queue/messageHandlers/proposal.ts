@@ -62,14 +62,8 @@ async function createUserAndAssignToExperiment(
   }
 }
 
-const handleProposalStatusChanged: ConsumerCallback = async (
-  _type,
-  message
-) => {
-  const proposalWithNewStatus =
-    message as unknown as ProposalStatusChangedEventPayload;
-  if (!['ALLOCATED', 'SCHEDULING'].includes(proposalWithNewStatus.newStatus))
-    return;
+export async function syncProposalData(proposalWithNewStatus: any) {
+  console.log('1---------');
   // Create New Proposal
   let proposal = await proposalDatasource.get(proposalWithNewStatus.proposalPk);
 
@@ -87,12 +81,13 @@ const handleProposalStatusChanged: ConsumerCallback = async (
       name: proposalWithNewStatus.instrument.shortCode,
     });
   }
+  console.log('2---------');
   // Assign Instrument to Proposal and create an Experiment
   await experimentDataSource.create({
     proposalPk: proposal.id,
     instrumentId: instrument.id,
   });
-
+  console.log('3---------');
   // Create new user for the proposer
   if (proposalWithNewStatus.proposer) {
     await createUserAndAssignToExperiment(
@@ -100,6 +95,7 @@ const handleProposalStatusChanged: ConsumerCallback = async (
       proposalWithNewStatus.proposalPk
     );
   }
+  console.log('4---------');
   // Create new user for the co-proposer
   const members = proposalWithNewStatus.members;
   for (const member of members) {
@@ -108,6 +104,19 @@ const handleProposalStatusChanged: ConsumerCallback = async (
       proposalWithNewStatus.proposalPk
     );
   }
+  console.log('5---------');
+}
+
+const handleProposalStatusChanged: ConsumerCallback = async (
+  _type,
+  message
+) => {
+  const proposalWithNewStatus =
+    message as unknown as ProposalStatusChangedEventPayload;
+  if (!['ALLOCATED', 'SCHEDULING'].includes(proposalWithNewStatus.newStatus))
+    return;
+
+  await syncProposalData(proposalWithNewStatus);
 };
 
 const handleProposalInstrumentSelected: ConsumerCallback = async (

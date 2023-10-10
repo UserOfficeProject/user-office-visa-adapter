@@ -1,3 +1,7 @@
+import { Knex } from 'knex';
+import { container } from 'tsyringe';
+
+import { Tokens } from '../../config/Tokens';
 import { Employer } from '../../models/Employer';
 import { User } from '../../models/User';
 import { ProposerPayload } from '../../types/proposal';
@@ -9,15 +13,23 @@ import {
 } from '../../types/records';
 import { UserUpdationEventPayload } from '../../types/user';
 import { UserDataSource } from '../UserDataSource';
-import database from './database';
-
+import Database from './database/index';
 export default class PostgresUserDataSource implements UserDataSource {
   private TABLE_NAME = 'users';
   private EMPLOYER_TABLE_NAME = 'employer';
   private USER_ROLE = 'user_role';
   private ROLE = 'role';
+
+  private database: Knex;
+  constructor() {
+    const databaseInstance = container.resolve<Database>(Tokens.Database);
+    (async () => {
+      this.database = await databaseInstance.connect();
+    })();
+  }
+
   async create(user: ProposerPayload): Promise<User> {
-    const userExists = await database(this.TABLE_NAME)
+    const userExists = await this.database(this.TABLE_NAME)
       .where({
         id: user.email,
       })
@@ -27,7 +39,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       });
     // Create an Employer, if it does not exist
     let employer: Employer;
-    const employerExists = await database(this.EMPLOYER_TABLE_NAME)
+    const employerExists = await this.database(this.EMPLOYER_TABLE_NAME)
       .where({
         id: user.institution.id,
       })
@@ -39,7 +51,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     if (employerExists) {
       employer = employerExists;
     } else {
-      employer = await database(this.EMPLOYER_TABLE_NAME)
+      employer = await this.database(this.EMPLOYER_TABLE_NAME)
         .insert({
           id: user.institution.id,
           name: user.institution.name,
@@ -53,7 +65,7 @@ export default class PostgresUserDataSource implements UserDataSource {
     if (userExists) {
       // Update user table if the institution_id is different
       if (userExists.affiliationId !== employer.id) {
-        return await database(this.TABLE_NAME)
+        return await this.database(this.TABLE_NAME)
           .where({
             email: user.email,
           })
@@ -69,7 +81,7 @@ export default class PostgresUserDataSource implements UserDataSource {
       }
     } else {
       // Insert into users table
-      return await database(this.TABLE_NAME)
+      return await this.database(this.TABLE_NAME)
         .insert({
           id: user.email,
           email: user.email,
@@ -80,14 +92,14 @@ export default class PostgresUserDataSource implements UserDataSource {
         })
         .returning(['*'])
         .then(async (user: UserRecord[]) => {
-          const scientificComputingRole = await database(this.ROLE)
+          const scientificComputingRole = await this.database(this.ROLE)
             .where({
               name: 'SCIENTIFIC_COMPUTING',
             })
             .first();
 
           if (scientificComputingRole) {
-            await database(this.USER_ROLE).insert({
+            await this.database(this.USER_ROLE).insert({
               user_id: user[0].id,
               role_id: scientificComputingRole.id,
             });
@@ -99,13 +111,13 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async update(user: UserUpdationEventPayload): Promise<User> {
-    const userExists = await database(this.TABLE_NAME).where({
+    const userExists = await this.database(this.TABLE_NAME).where({
       email: user.email,
     });
 
     // Update only if the User exists and submitted
     if (userExists) {
-      return await database(this.TABLE_NAME)
+      return await this.database(this.TABLE_NAME)
         .where({
           email: user.email,
         })
@@ -121,7 +133,7 @@ export default class PostgresUserDataSource implements UserDataSource {
   }
 
   async delete(id: number) {
-    await database(this.TABLE_NAME)
+    await this.database(this.TABLE_NAME)
       .where({
         id: id,
       })
