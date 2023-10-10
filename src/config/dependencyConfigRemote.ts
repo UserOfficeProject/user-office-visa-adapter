@@ -1,12 +1,12 @@
 import 'reflect-metadata';
-import LocalDatabase from '../datasources/postgres/database/local';
+import RemoteDatabase from '../datasources/postgres/database/remote';
 import PostgresExperimentDataSource from '../datasources/postgres/ExperimentDataSource';
 import PostgresExperimentUserDataSource from '../datasources/postgres/ExperimentUserDataSource';
 import PostgresInstrumentDataSource from '../datasources/postgres/InstrumentDataSource';
 import PostgresProposalDataSource from '../datasources/postgres/ProposalDataSource';
 import PostgresUserDataSource from '../datasources/postgres/UserDataSource';
-import { RabbitMQConsumer } from './../queue/consumers/rabbitMQ/RabbitMQConsumer';
-import { configureGraylogLogger } from './logger/configureGrayLogLogger';
+import { RabbitMQConsumer } from '../queue/consumers/rabbitMQ/RabbitMQConsumer';
+import { configureConsoleLogger } from './logger/configureConsoleLogger';
 import { Tokens } from './Tokens';
 import { mapClass, mapValue } from './utils';
 
@@ -17,5 +17,5 @@ mapClass(Tokens.ExperimentUserDataSource, PostgresExperimentUserDataSource);
 mapClass(Tokens.UserDataSource, PostgresUserDataSource);
 
 mapClass(Tokens.QueueConsumer, RabbitMQConsumer);
-mapClass(Tokens.Database, LocalDatabase);
-mapValue(Tokens.ConfigureLogger, configureGraylogLogger);
+mapValue(Tokens.ConfigureLogger, configureConsoleLogger);
+mapClass(Tokens.Database, RemoteDatabase);

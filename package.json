@@ -39,14 +39,18 @@
     "@graphql-codegen/typescript": "^2.4.9",
     "@graphql-codegen/typescript-graphql-request": "^4.5.4",
     "@graphql-codegen/typescript-operations": "^2.4.3",
+    "@types/knex": "^0.16.1",
+    "@types/pg": "^8.10.3",
+    "@types/ssh2": "^1.11.14",
     "@user-office-software/duo-logger": "^2.0.2",
     "@user-office-software/duo-message-broker": "^1.6.0",
     "dotenv": "^14.3.2",
     "express": "^4.18.1",
-    "knex": "^0.95.15",
-    "pg": "^8.8.0",
-    "tsyringe": "^4.6.0",
-    "reflect-metadata": "^0.1.13"
+    "knex": "^2.4.0",
+    "pg": "^8.11.3",
+    "reflect-metadata": "^0.1.13",
+    "ssh2": "^1.14.0",
+    "tsyringe": "^4.8.0"
   },
   "engines": {
     "npm": ">=9.0.0",
