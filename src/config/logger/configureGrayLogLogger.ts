@@ -2,6 +2,7 @@ import {
   ConsoleLogger,
   GrayLogLogger,
   setLogger,
+  logger,
 } from '@user-office-software/duo-logger';
 export function configureGraylogLogger() {
   const server = process.env.GRAYLOG_SERVER;
@@ -9,15 +10,23 @@ export function configureGraylogLogger() {
 
   if (server && port) {
     const env = process.env.NODE_ENV || 'unset';
-    setLogger(
+    setLogger([
       new GrayLogLogger(
         server,
         parseInt(port),
         { facility: 'DMSC', environment: env, service: 'duo-visa-adapter' },
         []
-      )
-    );
+      ),
+      new ConsoleLogger(), // additionally log to console as that will show up in docker logs
+    ]);
   } else {
     setLogger(new ConsoleLogger());
+    logger.logError(
+      'Can not use GraylogLogger because GRAYLOG_SERVER and/or GRAYLOG_PORT not set. Using console logger instead.',
+      {
+        server,
+        port,
+      }
+    );
   }
 }
