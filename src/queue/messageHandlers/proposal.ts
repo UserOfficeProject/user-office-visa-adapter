@@ -16,33 +16,27 @@ import {
   ProposerPayload,
 } from '../../types/proposal';
 
-const proposalDatasource = container.resolve<ProposalDataSource>(
-  Tokens.ProposalDataSource
-);
-const userDataSource = container.resolve<UserDataSource>(Tokens.UserDataSource);
-
-const experimentDataSource = container.resolve<ExperimentDataSource>(
-  Tokens.ExperimentDataSource
-);
-
-const experimentUserDataSource = container.resolve<ExperimentUserDataSource>(
-  Tokens.ExperimentUserDataSource
-);
-
-const instrumentDataSource = container.resolve<InstrumentDataSource>(
-  Tokens.InstrumentDataSource
-);
 const handleProposalSubmitted: ConsumerCallback = async (_type, message) => {
+  const proposalDatasource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+
   const proposal = message as unknown as ProposalSubmissionEventPayload;
   await proposalDatasource.create(proposal);
 };
 
 const handleProposalUpdated: ConsumerCallback = async (_type, message) => {
+  const proposalDatasource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
   const proposal = message as unknown as ProposalUpdationEventPayload;
   await proposalDatasource.update(proposal);
 };
 
 const handleProposalDeleted: ConsumerCallback = async (_type, message) => {
+  const proposalDatasource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
   const proposal = message as unknown as ProposalDeletionEventPayload;
   await proposalDatasource.delete(proposal.proposalPk);
 };
@@ -51,10 +45,22 @@ async function createUserAndAssignToExperiment(
   user: ProposerPayload,
   proposalPk: number
 ) {
+  const userDataSource = container.resolve<UserDataSource>(
+    Tokens.UserDataSource
+  );
+
+  const experimentDataSource = container.resolve<ExperimentDataSource>(
+    Tokens.ExperimentDataSource
+  );
+
+  const experimentUserDataSource = container.resolve<ExperimentUserDataSource>(
+    Tokens.ExperimentUserDataSource
+  );
+
   const createdUser = await userDataSource.create(user);
   const experiment = await experimentDataSource.getByProposalId(proposalPk);
 
-  if (experiment) {
+  if (experiment && createdUser) {
     await experimentUserDataSource.create({
       experimentId: experiment.id,
       userId: createdUser.id,
@@ -63,10 +69,19 @@ async function createUserAndAssignToExperiment(
 }
 
 export async function syncProposalData(proposalWithNewStatus: any) {
-  console.log('1---------');
+  const proposalDatasource = container.resolve<ProposalDataSource>(
+    Tokens.ProposalDataSource
+  );
+
+  const experimentDataSource = container.resolve<ExperimentDataSource>(
+    Tokens.ExperimentDataSource
+  );
+
+  const instrumentDataSource = container.resolve<InstrumentDataSource>(
+    Tokens.InstrumentDataSource
+  );
   // Create New Proposal
   let proposal = await proposalDatasource.get(proposalWithNewStatus.proposalPk);
-
   if (!proposal) {
     proposal = await proposalDatasource.create(proposalWithNewStatus);
   }
@@ -81,13 +96,11 @@ export async function syncProposalData(proposalWithNewStatus: any) {
       name: proposalWithNewStatus.instrument.shortCode,
     });
   }
-  console.log('2---------');
   // Assign Instrument to Proposal and create an Experiment
   await experimentDataSource.create({
     proposalPk: proposal.id,
     instrumentId: instrument.id,
   });
-  console.log('3---------');
   // Create new user for the proposer
   if (proposalWithNewStatus.proposer) {
     await createUserAndAssignToExperiment(
@@ -95,7 +108,6 @@ export async function syncProposalData(proposalWithNewStatus: any) {
       proposalWithNewStatus.proposalPk
     );
   }
-  console.log('4---------');
   // Create new user for the co-proposer
   const members = proposalWithNewStatus.members;
   for (const member of members) {
@@ -104,7 +116,6 @@ export async function syncProposalData(proposalWithNewStatus: any) {
       proposalWithNewStatus.proposalPk
     );
   }
-  console.log('5---------');
 }
 
 const handleProposalStatusChanged: ConsumerCallback = async (
@@ -123,6 +134,10 @@ const handleProposalInstrumentSelected: ConsumerCallback = async (
   _type,
   message
 ) => {
+  const experimentDataSource = container.resolve<ExperimentDataSource>(
+    Tokens.ExperimentDataSource
+  );
+
   const { instrumentId, proposalPks } =
     message as unknown as ProposalInstrumentSelectedPayload;
 

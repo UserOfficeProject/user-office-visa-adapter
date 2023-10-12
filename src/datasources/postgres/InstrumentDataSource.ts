@@ -1,7 +1,3 @@
-import { Knex } from 'knex';
-import { container } from 'tsyringe';
-
-import { Tokens } from '../../config/Tokens';
 import { Instrument } from '../../models/Instrument';
 import {
   InstrumentCreationEventPayload,
@@ -9,20 +5,14 @@ import {
 } from '../../types/instrument';
 import { InstrumentRecord, createInstrumentObject } from '../../types/records';
 import { InstrumentDataSource } from '../InstrumentDataSource';
-import Database from './database/index';
+import database from './database';
 export default class PostgresInstrumentDataSource
   implements InstrumentDataSource
 {
   private TABLE_NAME = 'instrument';
-  private database: Knex;
-  constructor() {
-    const databaseInstance = container.resolve<Database>(Tokens.Database);
-    (async () => {
-      this.database = await databaseInstance.connect();
-    })();
-  }
+
   async get(id: number): Promise<Instrument | null> {
-    return await this.database(this.TABLE_NAME)
+    return await database(this.TABLE_NAME)
       .where({
         id: id,
       })
@@ -34,7 +24,7 @@ export default class PostgresInstrumentDataSource
   async create(
     instrument: InstrumentCreationEventPayload
   ): Promise<Instrument> {
-    return await this.database(this.TABLE_NAME)
+    return await database(this.TABLE_NAME)
       .insert({
         id: instrument.id,
         name: instrument.name,
@@ -48,14 +38,14 @@ export default class PostgresInstrumentDataSource
   async update(
     instrument: InstrumentUpdationEventPayload
   ): Promise<Instrument> {
-    const instrumentExists = await this.database(this.TABLE_NAME)
+    const instrumentExists = await database(this.TABLE_NAME)
       .where({
         id: instrument.id,
       })
       .first();
 
     if (instrumentExists) {
-      return await this.database(this.TABLE_NAME)
+      return await database(this.TABLE_NAME)
         .where({
           id: instrument.id,
         })
@@ -68,7 +58,7 @@ export default class PostgresInstrumentDataSource
         });
     }
 
-    return await this.database(this.TABLE_NAME)
+    return await database(this.TABLE_NAME)
       .insert({
         id: instrument.id,
         name: instrument.name,
@@ -80,7 +70,7 @@ export default class PostgresInstrumentDataSource
   }
 
   async delete(id: number) {
-    await this.database(this.TABLE_NAME)
+    await database(this.TABLE_NAME)
       .where({
         id: id,
       })
