@@ -11,14 +11,14 @@ export interface CountryPayload {
 }
 
 export interface ProposerPayload {
-  firstName: string;
-  lastName: string;
-  email: string;
-  id: string;
-  oidcSub: string;
-  oauthIssuer: string;
-  institution: InstitutionPayload;
-  country: CountryPayload;
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  id?: string;
+  oidcSub?: string;
+  oauthIssuer?: string;
+  institution?: InstitutionPayload;
+  country?: CountryPayload;
 }
 
 export interface ProposalSubmissionEventPayload {

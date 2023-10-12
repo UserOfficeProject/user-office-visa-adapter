@@ -1,7 +1,6 @@
-import { Knex } from 'knex';
+import LocalDB from './local';
+import RemoteDB from './remote';
 
-interface Database {
-  connect(): Promise<Knex>;
-}
+const database = process.env.DEPENDENCY_CONFIG == 'remote' ? RemoteDB : LocalDB;
 
-export default Database;
+export default database;

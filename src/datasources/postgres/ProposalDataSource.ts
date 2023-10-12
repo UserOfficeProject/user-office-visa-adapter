@@ -1,7 +1,3 @@
-import { Knex } from 'knex';
-import { container } from 'tsyringe';
-
-import { Tokens } from '../../config/Tokens';
 import { Proposal } from '../../models/Proposal';
 import {
   ProposalSubmissionEventPayload,
@@ -9,21 +5,14 @@ import {
 } from '../../types/proposal';
 import { ProposalRecord, createProposalObject } from '../../types/records';
 import { ProposalDataSource } from '../ProposalDataSource';
+import database from './database';
 // import database from './database';
-import Database from './database/index';
 
 export default class PostgresProposalDataSource implements ProposalDataSource {
   private TABLE_NAME = 'proposal';
-  private database: Knex;
-  constructor() {
-    const databaseInstance = container.resolve<Database>(Tokens.Database);
-    (async () => {
-      this.database = await databaseInstance.connect();
-    })();
-  }
 
   async get(id: number): Promise<Proposal | null> {
-    return await this.database(this.TABLE_NAME)
+    return await database(this.TABLE_NAME)
       .where({
         id,
       })
@@ -33,7 +22,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
       });
   }
   async create(proposal: ProposalSubmissionEventPayload): Promise<Proposal> {
-    return await this.database(this.TABLE_NAME)
+    return await database(this.TABLE_NAME)
       .insert({
         id: proposal.proposalPk,
         identifier: proposal.shortCode,
@@ -47,7 +36,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async update(proposal: ProposalUpdationEventPayload): Promise<Proposal> {
-    const proposalExists = await this.database(this.TABLE_NAME)
+    const proposalExists = await database(this.TABLE_NAME)
       .where({
         id: proposal.proposalPk,
       })
@@ -55,7 +44,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
 
     // Update only if the Proposal exists and submitted
     if (proposalExists && proposal.submitted) {
-      return await this.database(this.TABLE_NAME)
+      return await database(this.TABLE_NAME)
         .where({
           id: proposal.proposalPk,
         })
@@ -72,7 +61,7 @@ export default class PostgresProposalDataSource implements ProposalDataSource {
   }
 
   async delete(id: number) {
-    await this.database(this.TABLE_NAME)
+    await database(this.TABLE_NAME)
       .where({
         id: id,
       })
