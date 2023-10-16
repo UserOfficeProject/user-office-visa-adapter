@@ -12,7 +12,7 @@ const synchronization = async () => {
     connection: conString,
   });
 
-  connection
+  await connection
     .select(
       connection.raw(
         'to_json(p.*) as proposal, to_json(i.*) as instrument, to_json(c.*) as call'
@@ -24,8 +24,8 @@ const synchronization = async () => {
     .join('instruments as i', 'ip.instrument_id', 'i.instrument_id')
     .join('call as c', 'p.call_id', 'c.call_id')
     .whereIn('ps.short_code', ['ALLOCATED', 'SCHEDULING'])
-    .then((proposals) => {
-      proposals.forEach(async (data, index) => {
+    .then(async (proposals) => {
+      for (const data of proposals) {
         const instrument = data.instrument;
         const call = data.call;
         const proposal = data.proposal;
@@ -133,7 +133,7 @@ const synchronization = async () => {
         };
 
         syncProposalData(messageData);
-      });
+      }
     });
 };
 const getSecondsPerAllocationTimeUnit = (

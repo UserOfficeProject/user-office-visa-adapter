@@ -24,6 +24,18 @@ export default class PostgresInstrumentDataSource
   async create(
     instrument: InstrumentCreationEventPayload
   ): Promise<Instrument> {
+    // Insert if not exists and return the instrument
+    const instrumentExists = await database(this.TABLE_NAME)
+      .where({
+        name: instrument.name,
+        id: instrument.id,
+      })
+      .first();
+
+    if (instrumentExists) {
+      return createInstrumentObject(instrumentExists);
+    }
+
     return await database(this.TABLE_NAME)
       .insert({
         id: instrument.id,
