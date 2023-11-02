@@ -43,7 +43,7 @@ export default class PostgresUserDataSource implements UserDataSource {
         .insert({
           id: user.institution.id,
           name: user.institution.name,
-          country_code: user.country.country ?? '',
+          country_code: user.country?.country ?? '',
         })
         .returning(['*'])
         .then((employer: EmployerRecord[]) => {
