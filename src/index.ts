@@ -32,11 +32,11 @@ async function bootstrap() {
 
   container.resolve<() => void>(Tokens.ConfigureLogger)();
 
-  if (process.env.DEPENDENCY_CONFIG === 'local') {
+  if (process.env.SYNCHRONIZE === 'true') {
     startQueueHandling();
   }
 
-  if (process.env.DEPENDENCY_CONFIG === 'local') {
+  if (process.env.SYNCHRONIZE === 'true') {
     await connectWithVisa();
     await connectWithUserOffice();
     app.get('/synchronize', async (req, res) => {

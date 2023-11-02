@@ -1,5 +1,4 @@
 import 'reflect-metadata';
-import RemoteDatabase from '../datasources/postgres/database/remote';
 import PostgresExperimentDataSource from '../datasources/postgres/ExperimentDataSource';
 import PostgresExperimentUserDataSource from '../datasources/postgres/ExperimentUserDataSource';
 import PostgresInstrumentDataSource from '../datasources/postgres/InstrumentDataSource';
@@ -15,7 +14,5 @@ mapClass(Tokens.ProposalDataSource, PostgresProposalDataSource);
 mapClass(Tokens.ExperimentDataSource, PostgresExperimentDataSource);
 mapClass(Tokens.ExperimentUserDataSource, PostgresExperimentUserDataSource);
 mapClass(Tokens.UserDataSource, PostgresUserDataSource);
-
 mapClass(Tokens.QueueConsumer, RabbitMQConsumer);
 mapValue(Tokens.ConfigureLogger, configureConsoleLogger);
-mapClass(Tokens.Database, RemoteDatabase);
